@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const morgan = require ("morgan");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
-const postRoute = require("./routes/recipePost")
+const postRoute = require("./routes/recipePost");
 require("./db/connection");
 
 
