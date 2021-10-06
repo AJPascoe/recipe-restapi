@@ -1,47 +1,17 @@
 const router = require("express").Router();
+const { createUser } = require("../controllers/auth");
+const { deleteRecipe, updateRecipe, getRecipe, getTimelineRecipe } = require("../controllers/post");
 const Post = require("../models/RecipePost");
 
 
 //Create a post
-router.post("/", async (req, res)=>{
-    const newPost = new Post(req.body);
-    try {
-        const savePost = await newPost.save();
-        res.status(200).json(savePost);
-    } catch (error) {
-        res.status(500).json(error);
-    }
-});
+router.post("/", createUser);
 
 // Update a post
-router.put("/:id", async (req, res) => {
-    try {
-      const post = await Post.findById(req.params.id);
-      if (post.userId === req.body.userId) {
-        await post.updateOne({ $set: req.body });
-        res.status(200).json("The post has been updated");
-      } else {
-        res.status(403).json("You can update only your post");
-      }
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  });
+router.put("/:id", updateRecipe);
 
 //Delete a post
-router.delete("/:id", async (req, res) => {
-    try {
-      const post = await Post.findById(req.params.id);
-      if (post.userId === req.body.userId) {
-          await post.deleteOne();
-          res.status(200).json("The post has been deleted");
-      } else {
-        res.status(403).json("You can only delete your post");
-      }
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  }); 
+router.delete("/:id", deleteRecipe); 
 
 //Like a post
 
@@ -62,30 +32,10 @@ router.delete("/:id", async (req, res) => {
 
 //Get a post
 
-router.get("/:id", async (req, res)=>{
-    try {
-      const post = await Post.findById(req.params.id);
-      res.status(200).json(post);
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  });
+router.get("/:id", getRecipe);
 
 // Get Timeline posts
-router.get("/timeline/all", async (req, res) => {
-    try {
-      const currentUser = await User.findById(req.body.userId);
-      const userPosts = await Post.find({ userId: currentUser._id });
-      const friendPosts = await Promise.all(
-        currentUser.followings.map((friendId) => {
-          return Post.find({ userId: friendId });
-        })
-      );
-      res.json(userPosts.concat(...friendPosts))
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  });
+router.get("/timeline/all", getTimelineRecipe);
   
 
 module.exports = router;
